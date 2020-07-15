@@ -66,7 +66,7 @@ function getRecipe(keyword, maxResults){
       const proxyurl = "https://cors-anywhere.herokuapp.com/";
 
       console.log(url);
-      fetch(proxyurl+url)
+      fetch(url)
     .then(response => {
       if (response.ok) {
         return response.json();
