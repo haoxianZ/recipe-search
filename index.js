@@ -13,31 +13,48 @@ const modelID='bd367be194cf45149e75f01d59f77ba7';
 const imgRecognitionURL = 'https://api.clarifai.com/v2/models/{THE_MODEL_ID}/outputs';
 const personalAccess = '739135542f1a4cf690810856c1fada5b';
 //app.models.predict(modelID,input).then()
-function getKeywords(imageUrl){
-    const url = `https://api.clarifai.com/v2/models/${modelID}/versions/${workflowVersion}outputs`
-    fetch(url, {body:{
-        "image": {
-          "url": imageUrl,
-          "allow_duplicate_url": true}},
-          headers: {"Authorization": "7e9e51c5562243fc8f358186afb8c93a",
-        "Content-Type":"application/json"}}
-        ).then(response => {
-            if (response.ok) {
-              return response.json();
-            }
-            throw new Error(response.statusText);
-          })
-          .then(responseJson => console.log(responseJson))
-          .catch(err => {
-            $('#js-error-message').text(`Something went wrong: ${err.message}`);
-          });
+//function to generate a list of keywords
+function displayKeywords(responseJson){
+  const keywords = [];
+  console.log(responseJson);
+  //set as 5 because free recipe search is throttle to 5/min requests
+  for (let i = 0; i < 8; i++){
+    keywords[i] = responseJson.outputs[0].data.concepts[i].name;
+}
+console.log(keywords.join(','))
+return keywords.join(',');
 };
+//function to call image recongition api and return keywords
+function getKeywords(imageUrl){
+  var settings = {
+    "url": `https://api.clarifai.com/v2/models/${modelID}/outputs`,
+    "method": "POST",
+    "timeout": 0,
+    "headers": {
+      "Authorization": `Key ${imgRecognitionAPIkey}`,
+      "Content-Type": "application/json"
+    },
+    "data": JSON.stringify({"inputs":[{"data":{"image":{"url":`${imageUrl}`}}}]}),
+  };
+  
+  $.ajax(settings).done(response => {
+      return response.json();
+  }).then(responseJson => {return displayKeywords(responseJson)})
+  .catch(err => {
+    $('#js-error-message').text(`Something went wrong: ${err.message}`);
+});
+};
+//a function to use return keyword string to search for recipe. 
+function imageRecipeSearch(imageUrl, maxResults){
+  getRecipe(getKeywords(imageUrl), maxResults)
+};
+//a function to format params from object to string
 function formatQueryParams(params) {
     const queryItems = Object.keys(params)
       .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
     return queryItems.join('&');
 };
-
+//function to perform recipe search base on keyword
 function getRecipe(keyword, maxResults){
     const params = {
         q: keyword,
@@ -62,6 +79,7 @@ function getRecipe(keyword, maxResults){
       $('#js-error-message').text(`Something went wrong: ${err.message}`);
     });
 };
+//function to display results from recipe search
 function displayResults(responseJson){
     // if there are previous results, remove them
   console.log(responseJson);
@@ -84,14 +102,20 @@ function displayResults(responseJson){
   $('#results').removeClass('hidden');
 
 };
+//call back function
 function watchForm() {
     $('form').submit(event => {
       event.preventDefault();
       const searchTerm = $('#js-search-term').val();
       const searchURL = $('#js-search-url').val();
       const maxResults = $('#js-max-results').val();
-      getRecipe(searchTerm,maxResults)
-      getKeywords(searchURL)
+      if(searchTerm){
+        getRecipe(searchTerm,maxResults)
+      }
+      else if(!searchTerm && searchURL){
+        imageRecipeSearch(searchURL, maxResults)
+      }
+      else{'invalid'}
     });
   }
   
