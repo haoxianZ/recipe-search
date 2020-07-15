@@ -1,28 +1,27 @@
 'use strict';
-
+//list of key and url for APIs
 const recipeSearchAPIid='2a499952';
 const recipeSearchAPIkey='c5e68ccb26db262d07a7a350a3573cc0';
 const recipeSearchURL='https://api.edamam.com/search';
 const imgRecognitionAPIkey = '7e9e51c5562243fc8f358186afb8c93a';
-//const Clarifai=require('clarifai');
-//const app = new Clarifai.App({apiKey: '7e9e51c5562243fc8f358186afb8c93a'});
-const appID= 'dc5ab558a2024361b516bdb793651649';
-const workflowVersion = 'dfebc169854e429086aceb8368662';
+//const appID= 'dc5ab558a2024361b516bdb793651649';
+//const workflowVersion = 'dfebc169854e429086aceb8368662';
 const modelID='bd367be194cf45149e75f01d59f77ba7';
 const imgRecognitionURL = 'https://api.clarifai.com/v2/models/{THE_MODEL_ID}/outputs';
-const personalAccess = '739135542f1a4cf690810856c1fada5b';
-//app.models.predict(modelID,input).then()
 //function to generate a list of keywords
 function displayKeywords(responseJson, maxResults){
   const keywords = [];
   console.log(responseJson);
-  //set as 5 because free recipe search is throttle to 5/min requests
+  //set as 5 because too many keywords will return no result
   for (let i = 0; i < 5; i++){
     keywords[i] = responseJson.outputs[0].data.concepts[i].name;
 }
 console.log(keywords.join(','))
-const string = keywords.join(',')
-getRecipe(string,maxResults);
+const stringKeywords = keywords.join(',')
+//showing user the keywords extracted from their image
+$('#js-search-term').val(stringKeywords)
+getRecipe(stringKeywords,maxResults);
+
 };
 //function to call image recongition api and return keywords
 function getKeywords(imageUrl, maxResults){
@@ -78,6 +77,16 @@ function getRecipe(keyword, maxResults){
       $('#js-error-message').text(`Something went wrong: ${err.message}`);
     });
 };
+//a function to append the list
+function generateList(array,ID,x){
+  
+  for (let x = 0; x<array.length;x++)
+  {
+      $(`#${ID}`).append(
+        `<li>${array[x]}</li>`
+      )
+  }
+};
 //function to display results from recipe search
 function displayResults(responseJson){
     // if there are previous results, remove them
@@ -92,23 +101,25 @@ function displayResults(responseJson){
     $('#results-list').append(
       `<li><h3>${responseJson.hits[i].recipe.label}</h3>
       <img src='${responseJson.hits[i].recipe.image}'>
-      <ul id="js-ingredient-list + ${i}"></ul>
       <a href='${responseJson.hits[i].recipe.url}' target="_blank">link for detail instruction</a>
-      
       </li>`
     )
-    //a function to append the list
-    for (let x = 0; x<responseJson.hits[i].recipe.ingredientLines.length;x++){
-      $(`#js-ingredient-list + ${i}`).append(
-        `<li>${responseJson.hits[i].recipe.ingredientLines[x]}</li>`
-      )
-    }
+    //create id for each
+    $('#results-list').append(
+      $('<div/>', { id: 'list' + i})
+    )
+    //call function to append ingredient list
+    const currentID = "list" + i;  
+    generateList(responseJson.hits[i].recipe.ingredientLines, currentID, i)
   };
   //display the results section  
   $('#results').removeClass('hidden');
 
 };
+//a function that shows what keywords are generated from the image to user
+function showKeywords(){
 
+};
 //call back function
 function watchForm() {
     $('form').submit(event => {
