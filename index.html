@@ -13,13 +13,19 @@
             <h1>Recipe Search</h1>
             <form id="js-form">
                 <label for="search-term">Search by Keyword</label>
-                <input type="text" name="search-term" id="js-search-term">
+                <input type="text" name="search-term" id="js-search-term" placeholder="use ',' to separate each word ">
 
                 <label for="max-results">Maximum results to return</label>
                 <input type="number" name="max-results" id="js-max-results" value="5">
     
                 <label for="search-url">Search by Image</label>
                 <input type="text" name="search-url" id="js-search-url" placeholder="copy and paste the url of an image">
+
+                <label for="search-file">upload your picture</label>
+                <input type="file" name="search-file" id="js-search-file" accept="image/*">
+                <!-- drag and dop box--> 
+                <div id="div1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+
     
                 <input type="submit" value="Submit">
             </form>

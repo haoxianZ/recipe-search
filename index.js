@@ -7,7 +7,7 @@ const imgRecognitionAPIkey = '7e9e51c5562243fc8f358186afb8c93a';
 //const appID= 'dc5ab558a2024361b516bdb793651649';
 //const workflowVersion = 'dfebc169854e429086aceb8368662';
 const modelID='bd367be194cf45149e75f01d59f77ba7';
-const imgRecognitionURL = 'https://api.clarifai.com/v2/models/{THE_MODEL_ID}/outputs';
+const imgRecognitionURL = `https://api.clarifai.com/v2/models/${modelID}/outputs`;
 //function to generate a list of keywords
 function displayKeywords(responseJson, maxResults){
   const keywords = [];
@@ -26,7 +26,7 @@ getRecipe(stringKeywords,maxResults);
 //function to call image recongition api and return keywords
 function getKeywords(imageUrl, maxResults){
   var settings = {
-    "url": `https://api.clarifai.com/v2/models/${modelID}/outputs`,
+    "url": imgRecognitionURL,
     "method": "POST",
     "timeout": 0,
     "headers": {
@@ -122,10 +122,15 @@ function displayResults(responseJson){
   $('#results').removeClass('hidden');
 
 };
-//a function that shows what keywords are generated from the image to user
-function showKeywords(){
-
-};
+//function to turn upload image to base64
+function encodeImageFileAsURL(element) {
+  var file = element[0].files[0];
+  var reader = new FileReader();
+  reader.onloadend = function() {
+    console.log('RESULT', reader.result)
+  }
+  reader.readAsDataURL(file);
+}
 //call back function
 function watchForm() {
     $('form').submit(event => {
@@ -133,9 +138,17 @@ function watchForm() {
       const searchTerm = $('#js-search-term').val();
       const searchURL = $('#js-search-url').val();
       const maxResults = $('#js-max-results').val();
+      const searchFile = $('#js-search-file').val();
+      console.log(searchFile)
       $('#js-search-url').val('')
       $('#js-search-term').val('')
-      if(searchTerm && !searchURL){
+      $('#js-max-results').val('')
+      if(searchFile){
+       searchURL = encodeImageFileAsURL(searchFile);
+       console.log(searchURL)
+       imageRecipeSearch(searchURL, maxResults)
+      }
+      else if(searchTerm && !searchURL){
         getRecipe(searchTerm,maxResults)
       }
       else if(!searchTerm && searchURL){
@@ -146,6 +159,6 @@ function watchForm() {
       }
       else{'invalid'}
     });
-  }
-  
-  $(watchForm);
+};
+//load function  
+$(watchForm);
