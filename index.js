@@ -92,6 +92,12 @@ function displayResults(responseJson){
     // if there are previous results, remove them
   console.log(responseJson);
   $('#results-list').empty();
+  //check if there is any recipe return
+  if(responseJson.count == 0){
+    console.log('count is 0 running')
+    $('#results').removeClass('hidden');
+    return $('#results-list').append('Sorry, Nothing is found! Please try reducing or change your keywords')
+  }
   // iterate through the items array
   for (let i = 0; i < responseJson.to; i++){
     // for each video object in the items 
@@ -129,11 +135,14 @@ function watchForm() {
       const maxResults = $('#js-max-results').val();
       $('#js-search-url').val('')
       $('#js-search-term').val('')
-      if(searchTerm){
+      if(searchTerm && !searchURL){
         getRecipe(searchTerm,maxResults)
       }
       else if(!searchTerm && searchURL){
         imageRecipeSearch(searchURL, maxResults)
+      }
+      else if(searchURL && searchTerm){
+        return $('.error-message').append('Please only use one method of input')
       }
       else{'invalid'}
     });

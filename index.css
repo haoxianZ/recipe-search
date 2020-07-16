@@ -1,3 +1,17 @@
+main{
+  width:70%;
+  margin:auto;
+  text-align: center;
+}
+li{
+  list-style: none;
+}
 .hidden {
     display: none;
   }
+#js-form{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
