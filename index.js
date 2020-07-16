@@ -140,6 +140,9 @@ function watchForm() {
       const maxResults = $('#js-max-results').val();
       const searchFile = $('#js-search-file').val();
       console.log(searchFile)
+      if (!searchURL && !searchTerm && !searchFile){
+        $('#js-error-message').append('insert one input')
+      }
       $('#js-search-url').val('')
       $('#js-search-term').val('')
       $('#js-max-results').val('')
