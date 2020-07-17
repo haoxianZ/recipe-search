@@ -19,10 +19,13 @@
 }
 
 main{
-  width:50%;
   margin:auto;
   text-align: center;
   color: whitesmoke ;
+}
+h1{
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-size: 50px;
 }
 /*making input box semi-transparent*/
 input {
@@ -32,24 +35,53 @@ input {
 ::placeholder{
   color:white;
 }
+/*design for input boxes*/
 #js-form{
   padding:100px 0;
-}
-.submitBtn{
-  font-size: larger;
-}
-.submitBtn:hover{
-  cursor: pointer;
-}
-li{
-  list-style: none;
-}
-.hidden {
-    display: none;
-  }
-#js-form{
+  width: 70%;
+  margin: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   text-align: center;
+}
+.submitBtn{
+  font-size: larger;
+}
+a{
+  color: azure;
+  font-size: larger;
+}
+a:hover,
+.submitBtn:hover{
+  cursor: pointer;
+}
+/*design for return results*/
+.hidden {
+  display: none;
+}
+#results-list{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+.item{
+  display: flex;
+  flex-direction: column;
+}
+li{
+  list-style: none;
+}
+
+/* responsive layout do */
+@media all and (min-width: 650px){
+  #results-list{
+    flex-wrap: wrap;
+    flex-direction: row;
+  }
+  .item{
+    width: 500px;
+  }
+
+
 }

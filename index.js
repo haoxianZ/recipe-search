@@ -39,7 +39,7 @@ function getKeywords(imageUrl, maxResults){
       return response.json();
   }).then(responseJson => displayKeywords(responseJson,maxResults))
   .catch(err => {
-    $('#js-error-message').text(`Something went wrong: ${err.message}`);
+    $('#js-error-message').text(`Something went wrong ${err.message}`);
 });
 };
 //a function to use return keyword string to search for recipe. 
@@ -57,8 +57,7 @@ function getRecipe(keyword, maxResults){
     const params = {
         q: keyword,
         app_id: `${recipeSearchAPIid}`,
-        app_key:`${recipeSearchAPIkey}`,
-        to: maxResults
+        app_key:`${recipeSearchAPIkey}`
       };
       const queryString = formatQueryParams(params)
       const url = recipeSearchURL + '?' + queryString;
@@ -72,9 +71,9 @@ function getRecipe(keyword, maxResults){
       }
       throw new Error(response.statusText);
     })
-    .then(responseJson => displayResults(responseJson))
+    .then(responseJson => displayResults(responseJson, maxResults))
     .catch(err => {
-      $('#js-error-message').text(`Something went wrong: ${err.message}`);
+      $('#js-error-message').text(`Something went wrong ${err.message}`);
     });
 };
 //a function to append the list
@@ -88,7 +87,7 @@ function generateList(array,ID,x){
   }
 };
 //function to display results from recipe search
-function displayResults(responseJson){
+function displayResults(responseJson,maxResults){
     // if there are previous results, remove them
   console.log(responseJson);
   $('#results-list').empty();
@@ -99,28 +98,59 @@ function displayResults(responseJson){
     return $('#results-list').append('Sorry, Nothing is found! Please try reducing or change your keywords')
   }
   // iterate through the items array
-  for (let i = 0; i < responseJson.to; i++){
+  for (let i = 0; i < maxResults; i++){
     // for each video object in the items 
     //array, add a list item to the results 
     //list with the video title, description,
     //and thumbnail
+    const currentID = "list" + i;  
     $('#results-list').append(
-      `<li><h3>${responseJson.hits[i].recipe.label}</h3>
+      `<div class="item" id=${currentID}><li><h3>${responseJson.hits[i].recipe.label}</h3>
       <img src='${responseJson.hits[i].recipe.image}'>
+      <br>
       <a href='${responseJson.hits[i].recipe.url}' target="_blank">link for detail instruction</a>
-      </li>`
+      </li></div>`
     )
     //create id for each
-    $('#results-list').append(
-      $('<div/>', { id: 'list' + i})
-    )
+    //$('#results-list').append(
+      //$('<div/>', { id: 'list' + i}, {class: 'item'})
+  // )
     //call function to append ingredient list
-    const currentID = "list" + i;  
+    
     generateList(responseJson.hits[i].recipe.ingredientLines, currentID, i)
   };
-  //display the results section  
+  $('#moreResults').append('<button id = "load" class="loadMore">Load More</button>');
+  loadMoreResults(responseJson,maxResults);
+   //display the results section  
   $('#results').removeClass('hidden');
+};
+//function for listening the loadMore Btn
+function loadMoreResults(responseJson,maxResults){
+  $('.loadMore').on("click", event =>{
+    for (let j = maxResults; j < responseJson.to; j++){
+      // for each video object in the items 
+      //array, add a list item to the results 
+      //list with the video title, description,
+      //and thumbnail
+      //create id for each
+      const currentIDj = "listj" + j;  
+      $('#results-list').append(
+        `<div class="item" id=${currentIDj}> <li><h3>${responseJson.hits[j].recipe.label}</h3>
+        <img src='${responseJson.hits[j].recipe.image}'>
+        <br>
+        <a href='${responseJson.hits[j].recipe.url}' target="_blank">link for detail instruction</a>
+        </li></div>`
+      )
+      
+      //call function to append ingredient list
+      
+      generateList(responseJson.hits[j].recipe.ingredientLines, currentIDj, j)
+    };
+    var v = document.getElementById("load");
+    const newLocal = "hidden";
+    v.className += newLocal
 
+  }) 
 };
 //function to turn upload image to base64
 function encodeImageFileAsURL(element) {
@@ -139,13 +169,9 @@ function watchForm() {
       const searchURL = $('#js-search-url').val();
       const maxResults = $('#js-max-results').val();
       const searchFile = $('#js-search-file').val();
+
       console.log(searchFile)
-      if (!searchURL && !searchTerm && !searchFile){
-        $('#js-error-message').append('insert one input')
-      }
       $('#js-search-url').val('')
-      $('#js-search-term').val('')
-      $('#js-max-results').val('')
       if(searchFile){
        searchURL = encodeImageFileAsURL(searchFile);
        console.log(searchURL)
