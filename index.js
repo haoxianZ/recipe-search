@@ -147,8 +147,7 @@ function loadMoreResults(responseJson,maxResults){
       generateList(responseJson.hits[j].recipe.ingredientLines, currentIDj, j)
     };
     var v = document.getElementById("load");
-    const newLocal = "hidden";
-    v.className += newLocal
+    v.classList.add("hidden")
 
   }) 
 };
