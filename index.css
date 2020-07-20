@@ -27,6 +27,16 @@ h1{
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   font-size: 50px;
 }
+h2{
+  font-size: xx-large;
+  text-align: center;
+}
+h3{
+  font-size: x-large;
+}
+h4{
+  font-size: larger;
+}
 /*making input box semi-transparent*/
 input {
   background-color: rgba(255, 255, 255, 0.5);
@@ -55,6 +65,7 @@ a{
 a:hover,
 .submitBtn:hover{
   cursor: pointer;
+  color: palegreen;
 }
 /*design for return results*/
 .hidden {
@@ -63,7 +74,8 @@ a:hover,
 #results-list{
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: center;
+  padding-inline-start: 0px;  
 }
 .item{
   display: flex;
@@ -74,10 +86,17 @@ li{
 }
 
 /* responsive layout do */
-@media all and (min-width: 650px){
+@media all and (min-width: 600px){
   #results-list{
     flex-wrap: wrap;
     flex-direction: row;
+  }
+  #js-search-term{
+    height:20px;
+    font-size:14pt;
+  }
+  #js-error-message{
+    font-size: 16pt;
   }
   .item{
     width: 500px;

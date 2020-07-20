@@ -11,17 +11,14 @@ const imgRecognitionURL = `https://api.clarifai.com/v2/models/${modelID}/outputs
 //function to generate a list of keywords
 function displayKeywords(responseJson, maxResults){
   const keywords = [];
-  console.log(responseJson);
   //set as 5 because too many keywords will return no result
   for (let i = 0; i < 5; i++){
     keywords[i] = responseJson.outputs[0].data.concepts[i].name;
 }
-console.log(keywords.join(','))
 const stringKeywords = keywords.join(',')
 //showing user the keywords extracted from their image
 $('#js-search-term').val(stringKeywords)
 getRecipe(stringKeywords,maxResults);
-
 };
 //function to call image recongition api and return keywords
 function getKeywords(imageUrl, maxResults){
@@ -57,13 +54,11 @@ function getRecipe(keyword, maxResults){
     const params = {
         q: keyword,
         app_id: `${recipeSearchAPIid}`,
-        app_key:`${recipeSearchAPIkey}`
+        app_key:`${recipeSearchAPIkey}`,
+        to: maxResults
       };
       const queryString = formatQueryParams(params)
       const url = recipeSearchURL + '?' + queryString;
-      const proxyurl = "https://cors-anywhere.herokuapp.com/";
-
-      console.log(url);
       fetch(url)
     .then(response => {
       if (response.ok) {
@@ -73,12 +68,12 @@ function getRecipe(keyword, maxResults){
     })
     .then(responseJson => displayResults(responseJson, maxResults))
     .catch(err => {
-      $('#js-error-message').text(`Something went wrong ${err.message}`);
+      $('#js-error-message').text(`Something went wrong! ${err.message}`);
     });
 };
 //a function to append the list
 function generateList(array,ID,x){
-  
+  $(`#${ID}`).append('<h4>Ingredient List: </h4>')
   for (let x = 0; x<array.length;x++)
   {
       $(`#${ID}`).append(
@@ -89,20 +84,16 @@ function generateList(array,ID,x){
 //function to display results from recipe search
 function displayResults(responseJson,maxResults){
     // if there are previous results, remove them
-  console.log(responseJson);
   $('#results-list').empty();
   //check if there is any recipe return
   if(responseJson.count == 0){
-    console.log('count is 0 running')
     $('#results').removeClass('hidden');
     return $('#results-list').append('Sorry, Nothing is found! Please try reducing or change your keywords')
   }
-  // iterate through the items array
-  for (let i = 0; i < maxResults; i++){
+  // iterate through the items array, show 6 at the beginning 
+  if (maxResults>6) {
+    for (let i = 0; i < 6; i++){
     // for each video object in the items 
-    //array, add a list item to the results 
-    //list with the video title, description,
-    //and thumbnail
     const currentID = "list" + i;  
     $('#results-list').append(
       `<div class="item" id=${currentID}><li><h3>${responseJson.hits[i].recipe.label}</h3>
@@ -111,23 +102,33 @@ function displayResults(responseJson,maxResults){
       <a href='${responseJson.hits[i].recipe.url}' target="_blank">link for detail instruction</a>
       </li></div>`
     )
-    //create id for each
-    //$('#results-list').append(
-      //$('<div/>', { id: 'list' + i}, {class: 'item'})
-  // )
-    //call function to append ingredient list
-    
     generateList(responseJson.hits[i].recipe.ingredientLines, currentID, i)
   };
   $('#moreResults').append('<button id = "load" class="loadMore">Load More</button>');
-  loadMoreResults(responseJson,maxResults);
+  loadMoreResults(responseJson);
+  } 
+  // if maxRessults is less than 6, it will all display at once, no load more button
+  else {
+    for (let i = 0; i < maxResults; i++){
+      // for each video object in the items 
+      const currentID = "list" + i;  
+      $('#results-list').append(
+        `<div class="item" id=${currentID}><li><h3>${responseJson.hits[i].recipe.label}</h3>
+        <img src='${responseJson.hits[i].recipe.image}'>
+        <br>
+        <a href='${responseJson.hits[i].recipe.url}' target="_blank">link for detail instruction</a>
+        </li></div>`
+      )
+      generateList(responseJson.hits[i].recipe.ingredientLines, currentID, i)
+    };
+  };
    //display the results section  
   $('#results').removeClass('hidden');
 };
 //function for listening the loadMore Btn
-function loadMoreResults(responseJson,maxResults){
+function loadMoreResults(responseJson){
   $('.loadMore').on("click", event =>{
-    for (let j = maxResults; j < responseJson.to; j++){
+    for (let j = 6; j < responseJson.to; j++){
       // for each video object in the items 
       //array, add a list item to the results 
       //list with the video title, description,
@@ -141,25 +142,13 @@ function loadMoreResults(responseJson,maxResults){
         <a href='${responseJson.hits[j].recipe.url}' target="_blank">link for detail instruction</a>
         </li></div>`
       )
-      
       //call function to append ingredient list
-      
       generateList(responseJson.hits[j].recipe.ingredientLines, currentIDj, j)
     };
-    var v = document.getElementById("load");
+    const v = document.getElementById("load");
     v.classList.add("hidden")
-
   }) 
 };
-//function to turn upload image to base64
-function encodeImageFileAsURL(element) {
-  var file = element[0].files[0];
-  var reader = new FileReader();
-  reader.onloadend = function() {
-    console.log('RESULT', reader.result)
-  }
-  reader.readAsDataURL(file);
-}
 //call back function
 function watchForm() {
     $('form').submit(event => {
@@ -167,16 +156,11 @@ function watchForm() {
       const searchTerm = $('#js-search-term').val();
       const searchURL = $('#js-search-url').val();
       const maxResults = $('#js-max-results').val();
-      const searchFile = $('#js-search-file').val();
-
-      console.log(searchFile)
+      //clearing previous results
+      $('#moreResults').html('')
+      //clearing url field
       $('#js-search-url').val('')
-      if(searchFile){
-       searchURL = encodeImageFileAsURL(searchFile);
-       console.log(searchURL)
-       imageRecipeSearch(searchURL, maxResults)
-      }
-      else if(searchTerm && !searchURL){
+      if(searchTerm && !searchURL){
         getRecipe(searchTerm,maxResults)
       }
       else if(!searchTerm && searchURL){
