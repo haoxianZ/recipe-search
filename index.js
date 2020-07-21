@@ -151,8 +151,25 @@ function loadMoreResults(responseJson){
     v.classList.add("hidden")
   }) 
 };
+  //controlling the display input from radio button
+function radioBtn(radio){
+  switch (radio.value)
+    {
+        case "insertWord":
+            $('#searchWord').removeClass('hidden');
+            $("#searchURL").addClass('hidden');
+            break;
+        case "insertURL":
+            $("#searchURL").removeClass('hidden');
+            $('#searchWord').addClass('hidden');
+            break;
+    }
+}
 //call back function
 function watchForm() {
+  //controlling the display input from radio button
+    radioBtn(radio)
+
     $('form').submit(event => {
       event.preventDefault();
       const searchTerm = $('#js-search-term').val();
