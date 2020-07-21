@@ -43,7 +43,8 @@ input {
   color: aliceblue;
 }
 ::placeholder{
-  color:white;
+  color:#023e8a;
+  font-weight: bold;
 }
 /*design for input boxes*/
 #js-form{
@@ -80,6 +81,8 @@ a:hover,
 .item{
   display: flex;
   flex-direction: column;
+  font-size: 14pt;
+  font-weight: 1000;
 }
 li{
   list-style: none;

@@ -9,19 +9,21 @@ const imgRecognitionAPIkey = '7e9e51c5562243fc8f358186afb8c93a';
 const modelID='bd367be194cf45149e75f01d59f77ba7';
 const imgRecognitionURL = `https://api.clarifai.com/v2/models/${modelID}/outputs`;
 //function to generate a list of keywords
-function displayKeywords(responseJson, maxResults){
+function displayKeywords(responseJson, maxResults,searchTerm){
   const keywords = [];
   //set as 5 because too many keywords will return no result
   for (let i = 0; i < 5; i++){
     keywords[i] = responseJson.outputs[0].data.concepts[i].name;
 }
-const stringKeywords = keywords.join(',')
+  keywords.push(searchTerm)
+const stringKeywords = keywords.join(',');
 //showing user the keywords extracted from their image
 $('#js-search-term').val(stringKeywords)
 getRecipe(stringKeywords,maxResults);
 };
+
 //function to call image recongition api and return keywords
-function getKeywords(imageUrl, maxResults){
+function getKeywords(imageUrl, maxResults,searchTerm){
   var settings = {
     "url": imgRecognitionURL,
     "method": "POST",
@@ -34,14 +36,14 @@ function getKeywords(imageUrl, maxResults){
   };
   $.ajax(settings).done(response => {
       return response.json();
-  }).then(responseJson => displayKeywords(responseJson,maxResults))
+  }).then(responseJson => displayKeywords(responseJson,maxResults,searchTerm))
   .catch(err => {
     $('#js-error-message').text(`Something went wrong ${err.message}`);
 });
 };
 //a function to use return keyword string to search for recipe. 
-function imageRecipeSearch(imageUrl, maxResults){
-  getKeywords(imageUrl,maxResults)
+function imageRecipeSearch(imageUrl, maxResults, searchTerm){
+  getKeywords(imageUrl,maxResults, searchTerm)
 };
 //a function to format params from object to string
 function formatQueryParams(params) {
@@ -96,11 +98,11 @@ function displayResults(responseJson,maxResults){
     // for each video object in the items 
     const currentID = "list" + i;  
     $('#results-list').append(
-      `<div class="item" id=${currentID}><li><h3>${responseJson.hits[i].recipe.label}</h3>
+      `<li class="item" id='${currentID}'><h3>${responseJson.hits[i].recipe.label}</h3>
       <img src='${responseJson.hits[i].recipe.image}'>
       <br>
       <a href='${responseJson.hits[i].recipe.url}' target="_blank">link for detail instruction</a>
-      </li></div>`
+      </li>`
     )
     generateList(responseJson.hits[i].recipe.ingredientLines, currentID, i)
   };
@@ -113,11 +115,11 @@ function displayResults(responseJson,maxResults){
       // for each video object in the items 
       const currentID = "list" + i;  
       $('#results-list').append(
-        `<div class="item" id=${currentID}><li><h3>${responseJson.hits[i].recipe.label}</h3>
-        <img src='${responseJson.hits[i].recipe.image}'>
+        `<li class="item" id='${currentID}'> <h3>${responseJson.hits[i].recipe.label}</h3>
+        <img src='${responseJson.hits[i].recipe.image}' alt='${responseJson.hits[i].recipe.label}'>
         <br>
         <a href='${responseJson.hits[i].recipe.url}' target="_blank">link for detail instruction</a>
-        </li></div>`
+        </li>`
       )
       generateList(responseJson.hits[i].recipe.ingredientLines, currentID, i)
     };
@@ -136,11 +138,11 @@ function loadMoreResults(responseJson){
       //create id for each
       const currentIDj = "listj" + j;  
       $('#results-list').append(
-        `<div class="item" id=${currentIDj}> <li><h3>${responseJson.hits[j].recipe.label}</h3>
-        <img src='${responseJson.hits[j].recipe.image}'>
+        `<li class="item" id='${currentIDj}'><h3>${responseJson.hits[j].recipe.label}</h3>
+        <img src='${responseJson.hits[j].recipe.image}' alt='${responseJson.hits[j].recipe.label}'>
         <br>
         <a href='${responseJson.hits[j].recipe.url}' target="_blank">link for detail instruction</a>
-        </li></div>`
+        </li>`
       )
       //call function to append ingredient list
       generateList(responseJson.hits[j].recipe.ingredientLines, currentIDj, j)
@@ -164,10 +166,11 @@ function watchForm() {
         getRecipe(searchTerm,maxResults)
       }
       else if(!searchTerm && searchURL){
-        imageRecipeSearch(searchURL, maxResults)
+        imageRecipeSearch(searchURL, maxResults,searchTerm)
       }
       else if(searchURL && searchTerm){
-        return $('.error-message').append('Please only use one method of input')
+        getKeywords(searchURL, maxResults,searchTerm)
+        $('#js-error-message').append('We are combining your search keywords and output from the image')
       }
       else{'invalid'}
     });
