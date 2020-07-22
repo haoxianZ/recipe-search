@@ -83,11 +83,16 @@ a:hover,
   color: black;
   background-color: aliceblue;
 }
+#results-list img{
+  height: 300px;
+  width: 300px;
+  text-align: center;
+  margin: auto;
+}
 .item{
   display: flex;
   flex-direction: column;
-  font-size: 14pt;
-  font-weight: 1000;
+  object-fit: contain;
 }
 li{
   list-style: none;
