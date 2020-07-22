@@ -6,6 +6,7 @@
   width: 200%; 
   height: 200%;
   z-index: -1;
+  opacity: 0.3;
 }
 #bg img {
   position: absolute; 
@@ -21,7 +22,7 @@
 main{
   margin:auto;
   text-align: center;
-  color: whitesmoke ;
+  color: black ;
   
 }
 h1{
@@ -40,7 +41,6 @@ h4{
 }
 /*making input box semi-transparent*/
 input {
-  background-color: antiquewhite;
   color: black;
   font-weight: bold;
 }
@@ -57,19 +57,19 @@ input {
   flex-direction: column;
   justify-content: center;
   text-align: center;
-  
 }
 .submitBtn{
   font-size: larger;
 }
 a{
-  color: azure;
+  color: black;
   font-size: larger;
+  font-weight: bold;
 }
 a:hover,
 .submitBtn:hover{
   cursor: pointer;
-  color: palegreen;
+  color: red;
 }
 /*design for return results*/
 .hidden {
@@ -81,7 +81,8 @@ a:hover,
   justify-content: center;
   padding-inline-start: 0px;  
   color: black;
-  background-color: aliceblue;
+  font-weight: bold;
+  
 }
 #results-list img{
   height: 300px;
