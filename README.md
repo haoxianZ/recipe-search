@@ -18,7 +18,7 @@ Examples:
 
 * HTML
 * CSS
-* JavaScipt
+* JavaScript
 * jQuery
 
 
